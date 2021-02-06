@@ -21,20 +21,20 @@ Aplikasi ini memanfaatkan package [`string-similarity`](https://github.com/aceak
 
 ## Instalasi & Konfigurasi
 
-Jalankan `npm i` terlebih dahulu untuk meng-install package yang dibutuhkan.
+Jalankan `npm i` terlebih dahulu untuk meng-install package yang
 
-### `config/config.json`
+#### `config/config.json`
 
 Ubah nama file `config.example.json` menjadi `config.json`, dan ubah konten sesuai kebutuhan:
 
-``` json
+``` js
 {
   "batch_name": "batch-name", // nama angkatan/batcn/kelas
   "base_ratio": 0.8 // batas rasio minimum antara 0 dan 1. Default: 0.8
 }
 ```
 
-### `moss`
+#### `moss`
 
 [Daftar akun Moss baru](https://theory.stanford.edu/~aiken/moss/) untuk mendapatkan script yang dibutuhkan.
 
@@ -49,11 +49,11 @@ Ganti `email_kamu@mail.com` dengan email-mu, tanpa kurung siku.
 
 Setelah beberapa saat, script akan dikirimkan dari Moss, berisikan script yang dibutuhkan, berikut dengan instruksinya. Tempatkan script dengan nama `moss` di direktori yang sama dengan `app.js`.
 
-### `config/valid-repositories.json`
+#### `config/valid-repositories.json`
 
 Tambahkan repository yang valid dalam format array of objects seperti contoh berikut:
 
-```json
+``` json
 [
   {
     "name": "repository-kamu"

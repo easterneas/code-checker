@@ -21,18 +21,18 @@ This app utilizes [`string-similarity`](https://github.com/aceakash/string-simil
 
 ## Setup
 
-### `config/config.json`
+#### `config/config.json`
 
 Rename `config.example.json` to `config.json`, and change its contents as needed:
 
-``` json
+``` js
 {
   "batch_name": "batch-name", // batch/organization/class name
   "base_ratio": 0.8 // minimum base ratio to be filtered, ranging from 0-1. Default: 0.8
 }
 ```
 
-### `moss`
+#### `moss`
 
 Get your Moss script by [registering your user email](https://theory.stanford.edu/~aiken/moss/) at Moss.
 
@@ -47,11 +47,11 @@ Change `your_email@mail.com` with your actual email, without brackets.
 
 After a short while, the script will be sent from Moss, containing the needed scripts along with the instructions. Place the script within the file `moss` inside the same directory as `app.js` file.
 
-### `config/valid-repositories.json`
+#### `config/valid-repositories.json`
 
 Add your valid repositories in array of objects format. For example:
 
-```json
+``` json
 [
   {
     "name": "your-repository-name"
