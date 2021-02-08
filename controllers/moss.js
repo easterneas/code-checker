@@ -1,4 +1,6 @@
 // const GithubRepo = require('../models/githubrepo')
+const { execSync } = require('child_process')
+const { writeFileSync } = require('fs')
 
 class MossController {
   static async generateMossResults(results, config){
@@ -25,7 +27,7 @@ class MossController {
         }
       }))
   
-      fsSync.writeFileSync(`results/${config.batch_name}/moss-${config.repo.name}.json`, JSON.stringify(mossURLs, null, 2))
+      writeFileSync(`results/${config.batch_name}/moss-${config.repo.name}.json`, JSON.stringify(mossURLs, null, 2))
       
       success(`MOSS results retrieved and saved in results/moss-${config.repo.name}.json!`)
     })
