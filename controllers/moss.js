@@ -16,6 +16,8 @@ class MossController {
           let mossOutput = execSync(`./moss -l javascript ./${config.repoBranchOutputDir}/${result.Student1.branch}.js ./${config.repoBranchOutputDir}/${result.Student2.branch}.js`, { encoding: 'utf8' })
           mossOutput = mossOutput.split('\n')
   
+          config.debug && console.log(mossOutput)
+
           console.log(`Generated case ${counter} of ${resultsCount}`)
           console.log(`URL: ${mossOutput[mossOutput.length - 2]}`)
   
