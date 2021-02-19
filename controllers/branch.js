@@ -1,4 +1,4 @@
-const { exec, execSync } = require('child_process')
+const { exec, execSync, spawnSync } = require('child_process')
 const fs = require('fs').promises
 const fsSync = require('fs')
 
@@ -21,7 +21,8 @@ class BranchController {
       console.log(`Checking repository ${config.repo.name} of ${config.batch_name} started`)
       console.log()
       
-      const output = execSync(`git ls-remote ${config.gitRepo} 'refs/heads/*'`, { encoding: 'utf8' })
+      const output = execSync(`git ls-remote ${config.gitRepo} "refs/heads/*"`, { encoding: 'utf8' })
+
       let branches = output.split('\n').map(line => line.split('\t')[1]).slice(0, -1).map(ref => ref.split('/').splice(-1)[0])
 
       branches = branches.filter(branch => !['master', 'main'].includes(branch)).sort((a, b) => {
