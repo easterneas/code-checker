@@ -6,7 +6,6 @@ const { gitClone, gitSSH } = require('../helpers/gitHelper')
 const { recursiveCombine } = require('../helpers/checker')
 
 class BranchController {
-
   static getBranches(name, config){
     return new Promise((success, fail) => {
       config.repo = { name }
@@ -77,7 +76,7 @@ class BranchController {
     }
   }
   
-  static writeMetadata = config => {
+  static writeMetadata(config) {
     console.log(`Branch cloning complete.`)
     console.log()
     
