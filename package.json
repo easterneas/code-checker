@@ -1,6 +1,6 @@
 {
-  "name": "cheat-detector",
-  "version": "1.0.0",
+  "name": "code-checker",
+  "version": "2.0.0",
   "main": "app.js",
   "dependencies": {
     "string-similarity": "^4.0.4"
