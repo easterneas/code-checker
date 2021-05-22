@@ -37,9 +37,9 @@ class MossController {
         }
       }))
   
-      writeFileSync(`results/${config.batch_name}/moss-${config.repo.name}.json`, JSON.stringify(mossURLs, null, 2))
+      writeFileSync(`${config.path.resultPath}`, JSON.stringify(results, null, 2))
       
-      success(`MOSS results retrieved and saved in results/moss-${config.repo.name}.json!`)
+      success(`Results has been updated with Moss URLs successfully! Head over to ${config.path.resultPath} to see the updated results!`)
     })
 	}
 	

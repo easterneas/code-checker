@@ -11,13 +11,18 @@ class BranchController {
 
   static getBranches(name, config){
     return new Promise((success, fail) => {
+      const BASE_PATH = `batches/${config.batch_name}/${name}`
+
       config.repo = { name }
       config.gitRepo = gitSSH({ batchName: config.batch_name, repoName: config.repo.name })
-      config.paths = {
-        testing: `tests/${config.repo.name}`,
-        results: `tests/${config.repo.name}`,
-        merged: `tests/${config.repo.name}`,
-        metadata: ``,
+
+      config.path = {
+        testPath: `${BASE_PATH}/tests`,
+        outputPath: `${BASE_PATH}/outputs`,
+        resultPath: `${BASE_PATH}/results.json`,
+        mossPath: `${BASE_PATH}/moss-results.json`,
+        mergedPath: `${BASE_PATH}/merged-results.json`,
+        metadataPath: `${BASE_PATH}/metadata.json`,
       }
 
       console.log(`Checking repository ${config.repo.name} of ${config.batch_name} started`)
@@ -48,7 +53,7 @@ class BranchController {
           const branchPath = `${config.paths.testing}/${branch}`
 
           // do git clone
-          await gitClone(config.gitRepo, branch, branchPath)
+          await gitClone(config.gitRepo, branch, config.path.testPath)
 
           // show git log from cloned branch
           return (new Promise((success, fail) => {
@@ -92,7 +97,7 @@ class BranchController {
     console.log(`Filtering and generating results...`)
     return {
       config,
-      files: fs.readdir(config.repoBranchOutputDir)
+      files: fs.readdir(config.path.testPath)
     }
   }
 }

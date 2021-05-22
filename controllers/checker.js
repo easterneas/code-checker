@@ -49,9 +49,7 @@ class CheckerController {
 
       return await files
     })
-    .then(files => Promise.all(files.filter(file => file !== 'metadata.json').map(async (firstFile, i) => {
-      return {
-        content: await fs.readFile(`${conf.repoBranchOutputDir}/${firstFile}`, 'utf8'),
+      content: await fs.readFile(`${conf.path.outputPath}/${firstFile}.js`, 'utf8'),
         name: firstFile
       }
     })))
@@ -64,8 +62,8 @@ class CheckerController {
     .then(message => {
       console.log(message)
       
-      !conf.debug && execSync(`rm ${conf.repoBranchOutputDir} -rf`)
-      !conf.debug && execSync(`rm ${conf.paths.testing} -rf`)
+      !conf.debug && execSync(`rm ${conf.path.branchPath} -rf`)
+      !conf.debug && execSync(`rm ${conf.path.testPath} -rf`)
     })
     .then(() => console.timeEnd('Completed! Time needed for completion was'))
     .catch(console.error)
@@ -91,11 +89,9 @@ class CheckerController {
       return { id: id++, ...result }
     })
 
-    createDirIfNotExist(`results/${conf.batch_name}`, true)
+    writeSyncJSON(`${conf.path.resultPath}`, ratioResults)
 
-    writeSyncJSON(`results/${conf.batch_name}/${conf.repo.name}.json`, ratioResults)
-
-    console.log(`Results saved as results/${conf.batch_name}/${conf.repo.name}.json! Head over there to see the details.`)
+    console.log(`Results saved as ${conf.path.resultPath}! Head over there to see the details.`)
     console.log()
 
     return ratioResults
