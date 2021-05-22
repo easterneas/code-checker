@@ -38,7 +38,8 @@ class BranchController {
   static cloneFromBranches(branches, config) {
     console.log(`Cloning each branch from a repository...`)
 
-    config.repoBranchOutputDir = `output/${config.repo.name}`
+    console.log(`Branch cloning complete.`)
+    console.log()
 
     return {
       ...config,
@@ -73,9 +74,6 @@ class BranchController {
   }
   
   static writeMetadata = config => {
-    console.log(`Branch cloning complete.`)
-    console.log()
-    
     console.log(`Writing git metadata to a file...`)
 
     config.gitMetadata = config.gitMetadata.sort((a, b) => {
