@@ -5,6 +5,7 @@ const fsSync = require('fs')
 const { gitClone, gitSSH } = require('../helpers/gitHelper')
 const { recursiveCombine } = require('../helpers/checker')
 const { createDirIfNotExist } = require('../helpers/fileHelper')
+const { sortAscending } = require('../helpers/sortHelper')
 
 class BranchController {
 
@@ -26,11 +27,7 @@ class BranchController {
 
       let branches = output.split('\n').map(line => line.split('\t')[1]).slice(0, -1).map(ref => ref.split('/').splice(-1)[0])
 
-      branches = branches.filter(branch => !['master', 'main'].includes(branch)).sort((a, b) => {
-        if(a > b) return 1
-        if(a < b) return -1
-        return 0
-      })
+      branches = branches.filter(branch => !['master', 'main'].includes(branch)).sort((a, b) => sortAscending(a, b))
 
       console.log(`Total branches: ${branches.length}`)
 
