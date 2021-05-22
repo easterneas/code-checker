@@ -8,8 +8,7 @@ const MossController = require('./moss')
 const BranchController = require('./branch')
 
 const GithubRepo = require('../models/githubrepo')
-const { writeSyncJSON, readSyncJSON } = require('../helpers/jsonHelper')
-const { createDirIfNotExist } = require('../helpers/fileHelper')
+const { sortDescending } = require('../helpers/sortHelper')
 
 class CheckerController {
   static check(params) {
