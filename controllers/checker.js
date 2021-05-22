@@ -8,6 +8,7 @@ const MossController = require('./moss')
 const BranchController = require('./branch')
 
 const GithubRepo = require('../models/githubrepo')
+const { writeSyncJSON } = require('../helpers/jsonHelper')
 const { sortDescending } = require('../helpers/sortHelper')
 
 class CheckerController {
