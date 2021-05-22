@@ -68,7 +68,7 @@ class CheckerController {
       !conf.debug && execSync(`rm ${conf.path.testPath} -rf`)
     })
     .then(() => console.timeEnd('Completed! Time needed for completion was'))
-    .catch(console.error)
+    .catch(({ stack }) => console.error({ err: stack, conf }))
   }
 
   static generateResults = (ratioResults, conf) => {
