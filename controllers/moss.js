@@ -1,47 +1,81 @@
 // const GithubRepo = require('../models/githubrepo')
 const { execSync } = require('child_process')
 const { writeFileSync } = require('fs')
+const { promisify } = require('util')
+const exec = promisify(require('child_process').exec)
 
 class MossController {
   static async generateMossResults(results, config){
-    return new Promise(async (success, fail) => {
-      const resultsCount = results.length
-      let counter = 1
+    let caseCount = 0
+    let counter = 1
+
+    results.forEach(result => caseCount += result.studentCases.length)
+
+    console.log()
+    console.log(`Begin generating second opinion results from MOSS...`)
+
+    // console.log({
+    //   caseCount,
+    //   results
+    // });
+
+    return {
+      results: await Promise.all(results.map(async result => {
+        try{
+          let baseStudentPath = `./${config.path.outputPath}/${result.student.branch}.js`
   
-      console.log()
-      console.log(`Begin generating second opinion results from MOSS...`)
-  
-      let mossURLs = await Promise.all(results.map(async result => {
-        try {
-          let args = `-l javascript ./${config.repoBranchOutputDir}/${result.Student1.branch}.js ./${config.repoBranchOutputDir}/${result.Student2.branch}.js`
           let mossCmd
-
-          if(process.platform === 'win32')
-            mossCmd = `bash -c "./moss ${args}"`
-          else
-            mossCmd = `./moss ${args}`
-
-          let mossOutput = execSync(mossCmd, { encoding: 'utf8' })
-          mossOutput = mossOutput.split('\n')
   
-          config.debug && console.log(mossOutput)
-
-          console.log(`Generated case ${counter} of ${resultsCount}`)
-          console.log(`URL: ${mossOutput[mossOutput.length - 2]}`)
+          result.studentCases = await Promise.all(result.studentCases.map(async studentCase => {
+            const { with: relatingStudent } = studentCase
   
-          return mossOutput[mossOutput.length - 2]
-        } catch (e) {
+            let studentCount = counter++
+            let relatingStudentPath = `./${config.path.outputPath}/${relatingStudent.branch}.js`
+            let args = `-l javascript ${baseStudentPath} ${relatingStudentPath}`
+  
+            if(process.platform === 'win32') mossCmd = `bash -c "./moss ${args}"`
+            else mossCmd = `./moss ${args}`
+            
+            try {
+              console.log(`Sending case #${studentCount} to Moss server...`)
+              console.log(`Case #${studentCount}: ${result.student.branch} x ${relatingStudent.branch}`);
+    
+              const { stdout, stderr } = await exec(mossCmd)
+  
+              if(stdout){
+                const mossOutput = stdout.split('\n')
+                const url = mossOutput[mossOutput.length - 2]
+  
+                config.debug && console.log(mossOutput)
+  
+                console.log(`Generated case #${studentCount}`)
+                console.log(`URL: ${url}`)
+  
+                studentCase.mossUrl = url
+              } else throw new Error(stderr)
+            } catch (e) {
+              console.log(e)
+            } finally {
+              return studentCase
+            }
+          }))
+  
+          return result
+        } catch(e) {
           console.error(e)
-        } finally {
-          counter += 1
         }
-      }))
-  
+      })),
+      config
+    }
+	}
+
+  static saveResults(results, config){
+    return new Promise(success => {
       writeFileSync(`${config.path.resultPath}`, JSON.stringify(results, null, 2))
       
       success(`Results has been updated with Moss URLs successfully! Head over to ${config.path.resultPath} to see the updated results!`)
     })
-	}
+  }
 	
   // static async resubmitNulls(){
   //   console.time('Completed! Time needed for completion was')

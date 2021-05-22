@@ -56,7 +56,9 @@ class CheckerController {
     .then(results => this.findSimilarities(results, conf))
     .then(results => this.generateResults(results, conf))
     .then(async results => {
-      if(conf.moss.enabled) return MossController.generateMossResults(results, conf)
+      if(conf.moss.enabled) {
+        return await MossController.generateMossResults(results, conf).then(({ results }) => MossController.saveResults(results, conf))
+      }
       else return 'MOSS checking ignored. Skipping...'
     })
     .then(message => {
