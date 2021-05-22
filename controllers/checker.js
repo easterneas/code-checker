@@ -47,7 +47,7 @@ class CheckerController {
     })
     .then(files => Promise.all(files.map(async (firstFile, i) => ({
       content: await fs.readFile(`${conf.path.outputPath}/${firstFile}.js`, 'utf8'),
-        name: firstFile
+      name: firstFile
     }))))
     .then(results => this.findSimilarities(results, conf))
     .then(results => this.generateResults(results, conf))
@@ -114,32 +114,32 @@ class CheckerController {
         student: gitMetadata[i],
         studentCases: []
       }
-
+  
       results.forEach((secondResult, j) => {
         if(i > j){
           const ratioResult = similarityCheck.compareTwoStrings(firstResult.content, secondResult.content)
           const normalizedRatio = (ratioResult - baseRatio) / (1 - baseRatio) * 100 // will change to baseRatio
-
+  
           // debug
           debug && console.log(firstResult.name, secondResult.name, ratioResult, normalizedRatio)
-
+  
           if(normalizedRatio > defaultRatio) {
             const relatingStudent = gitMetadata.find(student => student.branch === secondResult.name.split('.js')[0])
-
+  
             debug && console.log({ relatingStudent, result2: secondResult.name.split('.js')[0] })
-                
+  
             output.studentCases.push({
               with: relatingStudent,
               ratio: +normalizedRatio.toFixed(2)
             })
-              }
-            }
+          }
+        }
       })
-
+  
       output.studentCases.sort((a, b) => sortDescending(a, b, 'ratio'))
-
+  
       return output
-      })
+    })
   }
 }
 
