@@ -68,7 +68,7 @@ class CheckerController {
   }
 
   static generateResults = (ratioResults, conf) => {
-    ratioResults = ratioResults.filter(result => result.length > 0).flat()
+    conf.debug && writeSyncJSON('./debug.json', ratioResults)
 
     console.log(`Generated and filtered results successfully.`)
     console.log()
