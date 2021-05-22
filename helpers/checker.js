@@ -1,7 +1,9 @@
 const fs = require('fs')
 
-const IGNORED_NODES = [ 'node_modules', 'package.json', 'package-lock.json' ]
-const IGNORED_EXTENSIONS = [ '.md', '.jpg', '.jpeg', '.png', '.json', '.test.js', '.gif' ]
+const { dirs, files, extensions } = require('../config/ignored-nodes')
+
+const IGNORED_NODES = [ ...files, ...dirs ]
+const IGNORED_EXTENSIONS = [ ...extensions ]
 
 const clearWhitespaces = (content) => {
 	const regex = /\/\/.*?$|((?:[^\w\s]|^)\s*\/(?![*\/])(?:\\.|\[(?:\\.|.)\]|.)*?\/(?=[gmiy]{0,4}\s*(?![*\/])(?:\W|$)))|\/\*[\s\S]*?\*\//gm
