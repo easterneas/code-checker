@@ -23,10 +23,6 @@ switch(command) {
     params.ignoreMoss = args.includes('no-moss')
     if(params.repository) return CheckerController.check(params)
     else return console.log('You need to specify the repository name.')
-    // return
-  // case 'autoGenerateFiles':
-  //   params.automate = args[0] !== 'false'
-  //   return CheckerController.autoGenerateFiles(params)
   case 'resubmitNulls':
     return CheckerController.resubmitNulls()
   case 'filter':
@@ -34,14 +30,6 @@ switch(command) {
     if(params.ratioThreshold && !Number.isNaN(params.ratioThreshold))
       return CheckerController.filterRatioThreshold(params)
     else console.error('You need to set a ratio threshold. Exiting.')
-  // case 'filterCase':
-  //   return CheckerController.filterCase()
-  // case 'addTime':
-  //   return CheckerController.addTime()
-  // case 'urlChecker':
-  //   return CheckerController.urlChecker()
-  // case 'daySummary':
-  //   return CheckerController.daySummary()
   case 'summarize':
     if(params.repository) return SummarizerController.summarize(params)
     else return console.log('You need to specify the repository name.')
