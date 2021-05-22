@@ -68,12 +68,26 @@ class CheckerController {
   }
 
   static generateResults = (ratioResults, conf) => {
+    let totalCases = 0
+
+    ratioResults = ratioResults.filter(result => {
+      let flag = false
+      const caseCount = result.studentCases.length
+
+      if(caseCount) {
+        totalCases += caseCount
+        flag = true
+      }
+      
+      return flag
+    })
+    
     conf.debug && writeSyncJSON('./debug.json', ratioResults)
 
     console.log(`Generated and filtered results successfully.`)
     console.log()
 
-    console.log(`Total cases found: ${ratioResults.length} case(s)`)
+    console.log(`Total cases found: ${totalCases} case(s)`)
     console.log()
 
     console.log(`Sorting results and saving results to file...`)
