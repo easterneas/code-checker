@@ -26,10 +26,7 @@ class CheckerController {
 
     GithubRepo.getConfig()
     .then(config => {
-      conf = {
-        ...conf,
-        ...config,
-      }
+      conf = { ...conf, ...config }
 
       return GithubRepo.validateRepoName(conf)
     })
@@ -49,10 +46,10 @@ class CheckerController {
 
       return await files
     })
+    .then(files => Promise.all(files.map(async (firstFile, i) => ({
       content: await fs.readFile(`${conf.path.outputPath}/${firstFile}.js`, 'utf8'),
         name: firstFile
-      }
-    })))
+    }))))
     .then(results => this.findSimilarities(results, conf))
     .then(results => this.generateResults(results, conf))
     .then(async results => {
