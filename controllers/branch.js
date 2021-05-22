@@ -50,14 +50,15 @@ class BranchController {
       ...config,
       gitMetadata: Promise.all(branches.map(async branch => {
         try {
-          const branchPath = `${config.paths.testing}/${branch}`
-
           // do git clone
           await gitClone(config.gitRepo, branch, config.path.testPath)
 
+          const branchTestPath = `${config.path.testPath}/${branch}`
+          const branchOutputPath = `${config.path.outputPath}/${branch}`
+
           // show git log from cloned branch
           return (new Promise((success, fail) => {
-            exec(`git log`, { cwd: branchPath }, (err, out) => {
+            exec(`git log`, { cwd: `${branchTestPath}` }, (err, out) => {
               if(err) throw fail(err)
               
               const metadata = {
@@ -68,6 +69,8 @@ class BranchController {
           
               createDirIfNotExist(`${config.path.outputPath}`, true)
 
+              fsSync.writeFileSync(`${branchOutputPath}.js`, recursiveCombine(`${branchTestPath}`))
+              
               success(metadata)
             })
           }))
