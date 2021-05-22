@@ -80,11 +80,7 @@ class CheckerController {
     console.log(`Sorting results and saving results to file...`)
 
     let id = 1
-    ratioResults = ratioResults.sort((a, b) => {
-      if(a.ratio > b.ratio) return -1
-      else if(a.ratio < b.ratio) return 1
-      return 0
-    }).map(result => {
+    ratioResults = ratioResults.map(result => {
       return { id: id++, ...result }
     })
 
