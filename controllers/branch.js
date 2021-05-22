@@ -4,6 +4,7 @@ const fsSync = require('fs')
 
 const { gitClone, gitSSH } = require('../helpers/gitHelper')
 const { recursiveCombine } = require('../helpers/checker')
+const { createDirIfNotExist } = require('../helpers/fileHelper')
 
 class BranchController {
 
@@ -62,10 +63,7 @@ class BranchController {
                 commitTimeline: out.split('\n').filter(line => line.includes('Date:'))
               }
           
-              if(!fsSync.existsSync(`${config.repoBranchOutputDir}`))
-                fsSync.mkdirSync(`${config.repoBranchOutputDir}`, { recursive: true })
-              fsSync.writeFileSync(`${config.repoBranchOutputDir}/${branch}.js`, recursiveCombine(branchPath))
-              // execSync(`rm ${branchPath} -rf`)
+              createDirIfNotExist(`${config.path.outputPath}`, true)
 
               success(metadata)
             })
@@ -91,10 +89,8 @@ class BranchController {
 
     config.debug && console.log(config.gitMetadata)
 
-    if(!fsSync.existsSync(config.repoBranchOutputDir))
-      fsSync.mkdirSync(config.repoBranchOutputDir)
+    fsSync.writeFileSync(`${config.path.metadataPath}`, JSON.stringify(config.gitMetadata, null, 2))
 
-    fsSync.writeFileSync(`${config.repoBranchOutputDir}/metadata.json`, JSON.stringify(config.gitMetadata, null, 2))
     console.log(`Writing complete.`)
     console.log()
 
