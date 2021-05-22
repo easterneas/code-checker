@@ -1,6 +1,5 @@
 'use strict'
 const fs = require('fs').promises
-const fsSync = require('fs')
 const { execSync } = require('child_process')
 const similarityCheck = require('string-similarity')
 
