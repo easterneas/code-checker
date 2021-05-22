@@ -12,7 +12,7 @@ Repo ini merupakan kelanjutan dari repo Diffchecker Bot yang dikembangkan oleh [
 
 * Berbasis Javascript, menggunakan Dice's Coefficient untuk pembandingan antara 2 (atau lebih) string yang berbeda.
 * Hampir seluruh prosesnya asynchronous, membuat proses menjadi cepat.
-* Rasio yang dinormalisasi, ditarik dari `base_ratio` yang di-set pada file `config.json`.
+* Rasio yang dinormalisasi, ditarik dari `base_ratio` yang di-set pada file `config.js`.
 * Moss file submition untuk opini kedua dari hasil pengecekan.
 
 ## Cara Kerja
@@ -23,9 +23,9 @@ Aplikasi ini memanfaatkan package [`string-similarity`](https://github.com/aceak
 
 Jalankan `npm i` terlebih dahulu untuk meng-install package yang
 
-#### `config/config.json`
+#### `config/config.js`
 
-Ubah nama file `config.example.json` menjadi `config.json`, dan ubah konten sesuai kebutuhan:
+Ubah nama file `config.example.json` menjadi `config.js`, dan ubah konten sesuai kebutuhan:
 
 ``` js
 {
@@ -49,7 +49,7 @@ Ganti `email_kamu@mail.com` dengan email-mu, tanpa kurung siku.
 
 Setelah beberapa saat, script akan dikirimkan dari Moss, berisikan script yang dibutuhkan, berikut dengan instruksinya. Tempatkan script dengan nama `moss` di direktori yang sama dengan `app.js`.
 
-#### `config/valid-repositories.json`
+#### `config/valid-repositories.js`
 
 Tambahkan repository yang valid dalam format array of objects seperti contoh berikut:
 
@@ -99,7 +99,7 @@ Perintah ini membutuhkan parameter `repo-name` yang lalu diikuti oleh nama repo 
 
 Secara dasarnya, pengecekan tidak akan secara otomatis menggabungkan hasil dari lokal dan Moss, sehingga diperlukan langkah kedua ini. Perintah ini akan menggabungkan dua hasil, yang pertama merupakan hasil lokal, dan yang kedua merupakan hasil dari Moss.
 
-Seperti perintah sebelumnya, perintah `summarize` membutuhkan parameter `repo-name`, diikuti oleh nama repo yang dituju pada nama organisasi yang sudah di-set di `config.json`. Hasilnya bisa dilihat di direktori `results/merged/<nama-repo>.json`
+Seperti perintah sebelumnya, perintah `summarize` membutuhkan parameter `repo-name`, diikuti oleh nama repo yang dituju pada nama organisasi yang sudah di-set di `config.js`. Hasilnya bisa dilihat di direktori `results/merged/<nama-repo>.json`
 
 ## Kontribusi
 

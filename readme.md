@@ -12,7 +12,7 @@ This project is a continuation from Cheat Detector application, that was develop
 
 * Javascript based, using Dice's Coefficient to find similarities between 2 (or more) different strings.
 * Nearly all processes are asynchronous, making the process faster.
-* Normalized ratio, starting from the `base_ratio` set in `config.json`.
+* Normalized ratio, starting from the `base_ratio` set in `config.js`.
 * Also features a second opinion similarity checking from Moss.
 
 ## How it works
@@ -21,9 +21,9 @@ This app utilizes [`string-similarity`](https://github.com/aceakash/string-simil
 
 ## Setup
 
-#### `config/config.json`
+#### `config/config.js`
 
-Rename `config.example.json` to `config.json`, and change its contents as needed:
+Rename `config.example.json` to `config.js`, and change its contents as needed:
 
 ``` js
 {
@@ -47,7 +47,7 @@ Change `your_email@mail.com` with your actual email, without brackets.
 
 After a short while, the script will be sent from Moss, containing the needed scripts along with the instructions. Place the script within the file `moss` inside the same directory as `app.js` file.
 
-#### `config/valid-repositories.json`
+#### `config/valid-repositories.js`
 
 Add your valid repositories in array of objects format. For example:
 
@@ -91,13 +91,13 @@ Currently available commands:
 
 * `node app.js check repo-name <repository> [no-moss]`
 
-This command requires `repo-name` parameter set, followed by the actual repository name from `valid-repository.json`. The results of this process can be seen at `results/<org-name>/<repo-name>.json` directory.
+This command requires `repo-name` parameter set, followed by the actual repository name from `valid-repository.js`. The results of this process can be seen at `results/<org-name>/<repo-name>.json` directory.
 
 * `node app.js summarize repo-name <repository>`
 
 By default, the `check` command won't automatically combine results both from local and URL generated from Moss, so if you don't include `no-moss` parameter from the previous command, this command is mandatory.
 
-Same as previous command, `summarize` requires `repo-name` parameter set, followed by the actual repository name from `valid-repository.json`. The results can be seen at `results/merged/<repo-name>.json` directory.
+Same as previous command, `summarize` requires `repo-name` parameter set, followed by the actual repository name from `valid-repository.js`. The results can be seen at `results/merged/<repo-name>.json` directory.
 
 ## Contribute
 
