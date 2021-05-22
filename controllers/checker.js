@@ -96,49 +96,42 @@ class CheckerController {
     return ratioResults
   }
 
-  static findSimilarities = (results, conf) => Promise.all(results.map(async (firstResult, i) => {
-    return await new Promise((resolve => {
-      const fileResults = []
+  static findSimilarities = (results, conf) => {
+    const { base_ratio: baseRatio, filterRatio, gitMetadata, debug } = conf
+    const defaultRatio = filterRatio || 0
 
-      results.forEach(async (secondResult, j) => {
+    return results.map((firstResult, i) => {
+      const output = {
+        student: gitMetadata[i],
+        studentCases: []
+      }
+
+      results.forEach((secondResult, j) => {
         if(i > j){
-          const baseRatio = conf.base_ratio
-          const defaultRatio = conf.filterRatio || 0
           const ratioResult = similarityCheck.compareTwoStrings(firstResult.content, secondResult.content)
-          const normalizedRatio = (similarityCheck.compareTwoStrings(firstResult.content, secondResult.content) - baseRatio) / (1 - baseRatio) * 100 // will change to baseRatio
+          const normalizedRatio = (ratioResult - baseRatio) / (1 - baseRatio) * 100 // will change to baseRatio
 
           // debug
-          conf.debug && console.log(firstResult.name, secondResult.name, ratioResult, normalizedRatio)
+          debug && console.log(firstResult.name, secondResult.name, ratioResult, normalizedRatio)
 
           if(normalizedRatio > defaultRatio) {
-            let Student1, Student2, student1Flag = true, student2Flag = true
-            for(let i = 0; i < conf.gitMetadata.length; i++){
-              const meta = conf.gitMetadata[i]
+            const relatingStudent = gitMetadata.find(student => student.branch === secondResult.name.split('.js')[0])
 
-              if(student1Flag && meta.branch === firstResult.name.split('.js')[0]){
-                // debug
-                conf.debug && console.log({ meta, result1: firstResult.name.split('.js')[0] })
+            debug && console.log({ relatingStudent, result2: secondResult.name.split('.js')[0] })
                 
-                Student1 = meta
-                student1Flag = false
-              } else if(student2Flag && meta.branch === secondResult.name.split('.js')[0]){
-                // debug
-                conf.debug && console.log({ meta, result2: secondResult.name.split('.js')[0] })
-                
-                Student2 = meta
-                student2Flag = false
+            output.studentCases.push({
+              with: relatingStudent,
+              ratio: +normalizedRatio.toFixed(2)
+            })
               }
             }
-
-            const result = { Student1, Student2, ratio: +normalizedRatio.toFixed(2) }
-
-            fileResults.push(result)
-          }
-        }
       })
-      resolve(fileResults)
-    }))
-  }))
+
+      output.studentCases.sort((a, b) => sortDescending(a, b, 'ratio'))
+
+      return output
+      })
+  }
 }
 
 module.exports = CheckerController
