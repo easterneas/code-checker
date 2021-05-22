@@ -43,7 +43,7 @@ const recursiveCombine = (currentDir, appendedContent = '') => {
 						stringsInFile = stringsInFile.replace(/(\n\n)/gm,'\n')
 					}
 
-					appendedContent += `// File: ${rootPath.split('/').slice(1).join('/')}\n`
+					appendedContent += `// File: ${rootPath.split('/').slice(4).join('/')}\n`
 					appendedContent += '\n'
 					// appendedContent += '// =========================================\n'
 					// appendedContent += stringsInFile.replace(/(\n\n)|((?:[^\w\s]|^)\s*\/(?![*\/])(?:\\.|\[(?:\\.|.)\]|.)*?\/(?=[gmiy]{0,4}\s*(?![*\/])(?:\W|$)))|\/\/.*?$|\/\*[\s\S]*?\*\//gm, '\n')
