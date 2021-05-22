@@ -21,13 +21,17 @@ class GithubRepo {
     return new Promise((resolve, reject) => {
       const phaseRepos = require(`../config/valid-repositories.json`)
  
-      let fetchedRepo = phaseRepos.find(phaseRepo => phaseRepo.name.toLowerCase() === repo.toLowerCase())
+      let fetchedRepo = phaseRepos.find(phaseRepo => {
+        return phaseRepo.name.toLowerCase() === repo.toLowerCase()
+      })
 
       if(fetchedRepo) resolve(fetchedRepo)
       else reject({
         message: "You entered the repo name, but it's invalid. Check the input repo name again.",
-        availableRepos: phaseRepos.map(phaseRepo => phaseRepo.name)
+        availableRepos: (() => {
+          return phaseRepos.map(phaseRepo => phaseRepo.name)
       })
+    })
     })
   }
 
