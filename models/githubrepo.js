@@ -9,7 +9,7 @@ const IGNORED_NODES = [ 'node_modules', 'package.json', 'readme.md', 'package-lo
 class GithubRepo {
   // Config functions
   static async getConfig() {
-    return JSON.parse(await fs.readFile('./config/config.json', 'utf-8'))
+    return require('../config/config.js')
   }
 
   static getSSHName({ batch_name, repoName }) {
@@ -19,15 +19,19 @@ class GithubRepo {
   // Main functions
   static validateRepoName({ repo }) {
     return new Promise((resolve, reject) => {
-      const phaseRepos = require(`../config/valid-repositories.json`)
+      const phaseRepos = require(`../config/valid-repositories.js`)
  
-      let fetchedRepo = phaseRepos.find(phaseRepo => phaseRepo.name.toLowerCase() === repo.toLowerCase())
+      let fetchedRepo = phaseRepos.find(phaseRepo => {
+        return phaseRepo.name.toLowerCase() === repo.toLowerCase()
+      })
 
       if(fetchedRepo) resolve(fetchedRepo)
       else reject({
         message: "You entered the repo name, but it's invalid. Check the input repo name again.",
-        availableRepos: phaseRepos.map(phaseRepo => phaseRepo.name)
+        availableRepos: (() => {
+          return phaseRepos.map(phaseRepo => phaseRepo.name)
       })
+    })
     })
   }
 

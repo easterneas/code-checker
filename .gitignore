@@ -3,6 +3,8 @@ cases
 results
 output
 tests
-config/config.json
-config/valid-repositories.json
+config/config.js*
+config/valid-repositories.js*
 **moss
+batches
+**debug.json

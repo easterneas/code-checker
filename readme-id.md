@@ -12,7 +12,7 @@ Repo ini merupakan kelanjutan dari repo Diffchecker Bot yang dikembangkan oleh [
 
 * Berbasis Javascript, menggunakan Dice's Coefficient untuk pembandingan antara 2 (atau lebih) string yang berbeda.
 * Hampir seluruh prosesnya asynchronous, membuat proses menjadi cepat.
-* Rasio yang dinormalisasi, ditarik dari `base_ratio` yang di-set pada file `config.json`.
+* Rasio yang dinormalisasi, ditarik dari `base_ratio` yang di-set pada file `config.js`.
 * Moss file submition untuk opini kedua dari hasil pengecekan.
 
 ## Cara Kerja
@@ -23,16 +23,15 @@ Aplikasi ini memanfaatkan package [`string-similarity`](https://github.com/aceak
 
 Jalankan `npm i` terlebih dahulu untuk meng-install package yang
 
-#### `config/config.json`
+#### `config/config.js`
 
-Ubah nama file `config.example.json` menjadi `config.json`, dan ubah konten sesuai kebutuhan:
+Ubah nama file `config.example.js` menjadi `config.js`, dan ubah konten sesuai kebutuhan:
 
 ``` js
-{
-  "batch_name": "batch-name", // nama angkatan/batcn/kelas
-  "base_ratio": 0.8 // batas rasio minimum antara 0 dan 1. Default: 0.8
+module.exports = {
+  batch_name: "batch-name", // batch/organization/class name
+  base_ratio: 0.8 // minimum base ratio to be filtered, ranging from 0-1. Default: 0.8
 }
-```
 
 #### `moss`
 
@@ -49,14 +48,14 @@ Ganti `email_kamu@mail.com` dengan email-mu, tanpa kurung siku.
 
 Setelah beberapa saat, script akan dikirimkan dari Moss, berisikan script yang dibutuhkan, berikut dengan instruksinya. Tempatkan script dengan nama `moss` di direktori yang sama dengan `app.js`.
 
-#### `config/valid-repositories.json`
+#### `config/valid-repositories.js`
 
 Tambahkan repository yang valid dalam format array of objects seperti contoh berikut:
 
-``` json
-[
+``` js
+module.exports = [
   {
-    "name": "repository-kamu"
+    name: "your-repository-name"
   }
 ]
 ```
@@ -82,24 +81,13 @@ check repo-name <repo> [no-moss]
         - repo-name <repo>      specifies repository name
         - [no-moss]             disables Moss checking
         - [min-ratio] <0-100>   filters normalized ratio
-
-summarize repo-name <repository>
-        Summarizes both local results and Moss results (if any).
-        Won't summarize if there are no Moss results.
-        - repo-name <repo>      specifies repository name
 ```
 
 Daftar perintah saat ini:
 
 * `node app.js check repo-name <repository> [no-moss]`
 
-Perintah ini membutuhkan parameter `repo-name` yang lalu diikuti oleh nama repo yang dituju. Ketika selesai dijalankan, maka hasil bisa dilihat di direktori `results/<nama-organisasi>/<nama-repo>.json`
-
-* `node app.js summarize repo-name <repository>`
-
-Secara dasarnya, pengecekan tidak akan secara otomatis menggabungkan hasil dari lokal dan Moss, sehingga diperlukan langkah kedua ini. Perintah ini akan menggabungkan dua hasil, yang pertama merupakan hasil lokal, dan yang kedua merupakan hasil dari Moss.
-
-Seperti perintah sebelumnya, perintah `summarize` membutuhkan parameter `repo-name`, diikuti oleh nama repo yang dituju pada nama organisasi yang sudah di-set di `config.json`. Hasilnya bisa dilihat di direktori `results/merged/<nama-repo>.json`
+Perintah ini membutuhkan parameter `repo-name` yang lalu diikuti oleh nama repo yang dituju. Ketika selesai dijalankan, maka hasil bisa dilihat di direktori `batches/<nama-organisasi>/<nama-repo>/results.json`
 
 ## Kontribusi
 

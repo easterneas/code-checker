@@ -26,12 +26,6 @@ class View {
     console.log('\t- [no-moss]\t\tdisables Moss checking')
     console.log('\t- [min-ratio] <0-100>\tfilters normalized ratio')
     console.log('')
-    // summarize
-    console.log('summarize repo-name <repository>')
-    console.log('\tSummarizes both local results and Moss results (if any).')
-    console.log('\tWon\'t summarize if there are no Moss results.')
-    console.log('\t- repo-name <repo>\tspecifies repository name')
-    console.log('')
   }
 }
 

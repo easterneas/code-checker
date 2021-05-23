@@ -1,7 +1,9 @@
 const fs = require('fs')
 
-const IGNORED_NODES = [ 'node_modules', 'package.json', 'package-lock.json' ]
-const IGNORED_EXTENSIONS = [ '.md', '.jpg', '.jpeg', '.png', '.json', '.test.js', '.gif' ]
+const { dirs, files, extensions } = require('../config/ignored-nodes')
+
+const IGNORED_NODES = [ ...files, ...dirs ]
+const IGNORED_EXTENSIONS = [ ...extensions ]
 
 const clearWhitespaces = (content) => {
 	const regex = /\/\/.*?$|((?:[^\w\s]|^)\s*\/(?![*\/])(?:\\.|\[(?:\\.|.)\]|.)*?\/(?=[gmiy]{0,4}\s*(?![*\/])(?:\W|$)))|\/\*[\s\S]*?\*\//gm
@@ -41,12 +43,11 @@ const recursiveCombine = (currentDir, appendedContent = '') => {
 						stringsInFile = stringsInFile.replace(/(\n\n)/gm,'\n')
 					}
 
-					appendedContent += `// File: ${rootPath.split('/').slice(1).join('/')}\n`
+					appendedContent += `// File: ${rootPath.split('/').slice(4).join('/')}\n`
 					appendedContent += '\n'
 					// appendedContent += '// =========================================\n'
 					// appendedContent += stringsInFile.replace(/(\n\n)|((?:[^\w\s]|^)\s*\/(?![*\/])(?:\\.|\[(?:\\.|.)\]|.)*?\/(?=[gmiy]{0,4}\s*(?![*\/])(?:\W|$)))|\/\/.*?$|\/\*[\s\S]*?\*\//gm, '\n')
-					appendedContent += stringsInFile
-					appendedContent += '\n'
+					appendedContent += `${stringsInFile}\n`
 					appendedContent += '\n'
 				} catch (error) {
 					console.log(error)

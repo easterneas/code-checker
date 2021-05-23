@@ -1,6 +1,5 @@
 'use strict'
 const fs = require('fs').promises
-const fsSync = require('fs')
 const { execSync } = require('child_process')
 const similarityCheck = require('string-similarity')
 
@@ -8,8 +7,8 @@ const MossController = require('./moss')
 const BranchController = require('./branch')
 
 const GithubRepo = require('../models/githubrepo')
-const { writeSyncJSON, readSyncJSON } = require('../helpers/jsonHelper')
-const { createDirIfNotExist } = require('../helpers/fileHelper')
+const { writeSyncJSON } = require('../helpers/jsonHelper')
+const { sortDescending } = require('../helpers/sortHelper')
 
 class CheckerController {
   static check(params) {
@@ -26,10 +25,7 @@ class CheckerController {
 
     GithubRepo.getConfig()
     .then(config => {
-      conf = {
-        ...conf,
-        ...config,
-      }
+      conf = { ...conf, ...config }
 
       return GithubRepo.validateRepoName(conf)
     })
@@ -49,101 +45,102 @@ class CheckerController {
 
       return await files
     })
-    .then(files => Promise.all(files.filter(file => file !== 'metadata.json').map(async (firstFile, i) => {
-      return {
-        content: await fs.readFile(`${conf.repoBranchOutputDir}/${firstFile}`, 'utf8'),
-        name: firstFile
-      }
-    })))
+    .then(files => Promise.all(files.map(async (firstFile, i) => ({
+      content: await fs.readFile(`${conf.path.outputPath}/${firstFile}.js`, 'utf8'),
+      name: firstFile
+    }))))
     .then(results => this.findSimilarities(results, conf))
     .then(results => this.generateResults(results, conf))
     .then(async results => {
-      if(conf.moss.enabled) return MossController.generateMossResults(results, conf)
+      if(conf.moss.enabled) {
+        return await MossController.generateMossResults(results, conf).then(({ results }) => MossController.saveResults(results, conf))
+      }
       else return 'MOSS checking ignored. Skipping...'
     })
     .then(message => {
       console.log(message)
       
-      !conf.debug && execSync(`rm ${conf.repoBranchOutputDir} -rf`)
-      !conf.debug && execSync(`rm ${conf.paths.testing} -rf`)
+      !conf.debug && execSync(`rm ${conf.path.branchPath} -rf`)
+      !conf.debug && execSync(`rm ${conf.path.testPath} -rf`)
     })
     .then(() => console.timeEnd('Completed! Time needed for completion was'))
-    .catch(console.error)
+    .catch(({ stack }) => console.error({ err: stack, conf }))
   }
 
   static generateResults = (ratioResults, conf) => {
-    ratioResults = ratioResults.filter(result => result.length > 0).flat()
+    let totalCases = 0
+
+    ratioResults = ratioResults.filter(result => {
+      let flag = false
+      const caseCount = result.studentCases.length
+
+      if(caseCount) {
+        totalCases += caseCount
+        flag = true
+      }
+      
+      return flag
+    })
+    
+    conf.debug && writeSyncJSON('./debug.json', ratioResults)
 
     console.log(`Generated and filtered results successfully.`)
     console.log()
 
-    console.log(`Total cases found: ${ratioResults.length} case(s)`)
+    console.log(`Total cases found: ${totalCases} case(s)`)
     console.log()
 
     console.log(`Sorting results and saving results to file...`)
 
     let id = 1
-    ratioResults = ratioResults.sort((a, b) => {
-      if(a.ratio > b.ratio) return -1
-      else if(a.ratio < b.ratio) return 1
-      return 0
-    }).map(result => {
+    ratioResults = ratioResults.map(result => {
       return { id: id++, ...result }
     })
 
-    createDirIfNotExist(`results/${conf.batch_name}`, true)
+    writeSyncJSON(`${conf.path.resultPath}`, ratioResults)
 
-    writeSyncJSON(`results/${conf.batch_name}/${conf.repo.name}.json`, ratioResults)
-
-    console.log(`Results saved as results/${conf.batch_name}/${conf.repo.name}.json! Head over there to see the details.`)
+    console.log(`Results saved as ${conf.path.resultPath}! Head over there to see the details.`)
     console.log()
 
     return ratioResults
   }
 
-  static findSimilarities = (results, conf) => Promise.all(results.map(async (firstResult, i) => {
-    return await new Promise((resolve => {
-      const fileResults = []
+  static findSimilarities = (results, conf) => {
+    const { base_ratio: baseRatio, filterRatio, gitMetadata, debug } = conf
+    const defaultRatio = filterRatio || 0
 
-      results.forEach(async (secondResult, j) => {
+    return results.map((firstResult, i) => {
+      const output = {
+        student: gitMetadata[i],
+        studentCases: []
+      }
+  
+      results.forEach((secondResult, j) => {
         if(i > j){
-          const baseRatio = conf.base_ratio
-          const defaultRatio = conf.filterRatio || 0
           const ratioResult = similarityCheck.compareTwoStrings(firstResult.content, secondResult.content)
-          const normalizedRatio = (similarityCheck.compareTwoStrings(firstResult.content, secondResult.content) - baseRatio) / (1 - baseRatio) * 100 // will change to baseRatio
-
+          const normalizedRatio = (ratioResult - baseRatio) / (1 - baseRatio) * 100 // will change to baseRatio
+  
           // debug
-          conf.debug && console.log(firstResult.name, secondResult.name, ratioResult, normalizedRatio)
-
+          debug && console.log(firstResult.name, secondResult.name, ratioResult, normalizedRatio)
+  
           if(normalizedRatio > defaultRatio) {
-            let Student1, Student2, student1Flag = true, student2Flag = true
-            for(let i = 0; i < conf.gitMetadata.length; i++){
-              const meta = conf.gitMetadata[i]
-
-              if(student1Flag && meta.branch === firstResult.name.split('.js')[0]){
-                // debug
-                conf.debug && console.log({ meta, result1: firstResult.name.split('.js')[0] })
-                
-                Student1 = meta
-                student1Flag = false
-              } else if(student2Flag && meta.branch === secondResult.name.split('.js')[0]){
-                // debug
-                conf.debug && console.log({ meta, result2: secondResult.name.split('.js')[0] })
-                
-                Student2 = meta
-                student2Flag = false
-              }
-            }
-
-            const result = { Student1, Student2, ratio: +normalizedRatio.toFixed(2) }
-
-            fileResults.push(result)
+            const relatingStudent = gitMetadata.find(student => student.branch === secondResult.name.split('.js')[0])
+  
+            debug && console.log({ relatingStudent, result2: secondResult.name.split('.js')[0] })
+  
+            output.studentCases.push({
+              with: relatingStudent,
+              ratio: +normalizedRatio.toFixed(2)
+            })
           }
         }
       })
-      resolve(fileResults)
-    }))
-  }))
+  
+      output.studentCases.sort((a, b) => sortDescending(a, b, 'ratio'))
+  
+      return output
+    })
+  }
 }
 
 module.exports = CheckerController
