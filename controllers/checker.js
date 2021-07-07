@@ -12,7 +12,7 @@ const { sortDescending } = require('../helpers/sortHelper')
 
 class CheckerController {
   static check(params) {
-    console.time('Completed! Time needed for completion was')
+    console.time(`Checking complete! I took`)
     let conf = {
       debug: params.debug,
       moss: {
@@ -58,8 +58,13 @@ class CheckerController {
       else return 'MOSS checking ignored. Skipping...'
     })
     .then(message => {
+      console.log()
       console.log(message)
-      
+      console.log()
+    })
+    .then(() => console.timeEnd(`Checking complete! I took`))
+    .catch(({ stack }) => console.error({ err: stack, conf }))
+    .finally(_ => {
       !conf.debug && execSync(`rm ${conf.path.branchPath} -rf`)
       !conf.debug && execSync(`rm ${conf.path.testPath} -rf`)
     })
@@ -99,7 +104,10 @@ class CheckerController {
 
     writeSyncJSON(`${conf.path.resultPath}`, ratioResults)
 
-    console.log(`Results saved as ${conf.path.resultPath}! Head over there to see the details.`)
+    console.log(`Local checking complete!`)
+    console.log(`Student's git metadata file is saved here: ${conf.path.metadataPath}`)
+    console.log()
+    console.log(`Local ratio checking results file is saved here: ${conf.path.resultPath}`)
     console.log()
 
     return ratioResults
