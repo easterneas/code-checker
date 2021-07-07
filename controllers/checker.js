@@ -53,7 +53,9 @@ class CheckerController {
     .then(results => this.generateResults(results, conf))
     .then(async results => {
       if(conf.moss.enabled) {
-        return await MossController.generateMossResults(results, conf).then(({ results }) => MossController.saveResults(results, conf))
+        const mossUrl = await MossController.generateMossResults(results, conf)
+        // return await MossController.generateMossResults(results, conf).then(({ results }) => MossController.saveResults(results, conf))
+        return `Moss says... we should check here:\n${mossUrl}\n\nThe URL is valid for 2 weeks.`
       }
       else return 'MOSS checking ignored. Skipping...'
     })
@@ -68,8 +70,6 @@ class CheckerController {
       !conf.debug && execSync(`rm ${conf.path.branchPath} -rf`)
       !conf.debug && execSync(`rm ${conf.path.testPath} -rf`)
     })
-    .then(() => console.timeEnd('Completed! Time needed for completion was'))
-    .catch(({ stack }) => console.error({ err: stack, conf }))
   }
 
   static generateResults = (ratioResults, conf) => {

@@ -8,74 +8,92 @@ class MossController {
   static async generateMossResults(results, config){
     let caseCount = 0
     let counter = 1
+  
+    let mossCmd
 
     results.forEach(result => caseCount += result.studentCases.length)
 
     console.log()
-    console.log(`Begin generating second opinion results from MOSS...`)
+    console.log(`Asking Moss for a second opinion...`)
+
+    try{
+      let args = `-l javascript ./${config.path.outputPath}/*.js`
+  
+      if(process.platform === 'win32') mossCmd = `bash -c "./moss ${args}"`
+      else mossCmd = `./moss ${args}`
+      console.log(`Sending data to Moss server...`)
+    
+      const { stdout, stderr } = await exec(mossCmd)
+  
+      if(stderr) throw stderr
+    
+      return stdout.split('\n').splice(-2, 1)[0]
+    }catch(e){
+      throw e
+    }
 
     // console.log({
     //   caseCount,
     //   results
     // });
 
-    return {
-      results: await Promise.all(results.map(async result => {
-        try{
-          let baseStudentPath = `./${config.path.outputPath}/${result.student.branch}.js`
+    // return {
+    //   results: await Promise.all(results.map(async result => {
+    //     try{
+    //       let baseStudentPath = `./${config.path.outputPath}/${result.student.branch}.js`
   
-          let mossCmd
+    //       let mossCmd
   
-          result.studentCases = await Promise.all(result.studentCases.map(async studentCase => {
-            const { with: relatingStudent } = studentCase
+    //       result.studentCases = await Promise.all(result.studentCases.map(async studentCase => {
+    //         const { with: relatingStudent } = studentCase
   
-            let studentCount = counter++
-            let relatingStudentPath = `./${config.path.outputPath}/${relatingStudent.branch}.js`
-            let args = `-l javascript ${baseStudentPath} ${relatingStudentPath}`
+    //         let studentCount = counter++
+    //         let relatingStudentPath = `./${config.path.outputPath}/${relatingStudent.branch}.js`
+    //         let args = `-l javascript ${baseStudentPath} ${relatingStudentPath}`
   
-            if(process.platform === 'win32') mossCmd = `bash -c "./moss ${args}"`
-            else mossCmd = `./moss ${args}`
+    //         if(process.platform === 'win32') mossCmd = `bash -c "./moss ${args}"`
+    //         else mossCmd = `./moss ${args}`
             
-            try {
-              console.log(`Sending case #${studentCount} to Moss server...`)
-              console.log(`Case #${studentCount}: ${result.student.branch} x ${relatingStudent.branch}`);
+    //         try {
+    //           console.log(`Sending case #${studentCount} to Moss server...`)
+    //           console.log(`Case #${studentCount}: ${result.student.branch} x ${relatingStudent.branch}`);
     
-              const { stdout, stderr } = await exec(mossCmd)
+    //           const { stdout, stderr } = await exec(mossCmd)
   
-              if(stdout){
-                const mossOutput = stdout.split('\n')
-                const url = mossOutput[mossOutput.length - 2]
+    //           if(stdout){
+    //             const mossOutput = stdout.split('\n')
+    //             const url = mossOutput[mossOutput.length - 2]
   
-                config.debug && console.log(mossOutput)
+    //             config.debug && console.log(mossOutput)
   
-                console.log(`Generated case #${studentCount}`)
-                console.log(`URL: ${url}`)
+    //             console.log(`Generated case #${studentCount}`)
+    //             console.log(`URL: ${url}`)
   
-                studentCase.mossUrl = url
-              } else throw new Error(stderr)
-            } catch (e) {
-              console.log(e)
-            } finally {
-              return studentCase
-            }
-          }))
+    //             studentCase.mossUrl = url
+    //           } else throw new Error(stderr)
+    //         } catch (e) {
+    //           console.log(e)
+    //         } finally {
+    //           return studentCase
+    //         }
+    //       }))
   
-          return result
-        } catch(e) {
-          console.error(e)
-        }
-      })),
-      config
-    }
+    //       return result
+    //     } catch(e) {
+    //       console.error(e)
+    //     }
+    //   })),
+    //   config
+    // }
 	}
 
-  static saveResults(results, config){
-    return new Promise(success => {
-      writeFileSync(`${config.path.resultPath}`, JSON.stringify(results, null, 2))
+  // static saveResults(results, config){
+  //   return new Promise(success => {
+  //     writeFileSync(`${config.path.resultPath}`, JSON.stringify(results, null, 2))
       
-      success(`Results has been updated with Moss URLs successfully! Head over to ${config.path.resultPath} to see the updated results!`)
-    })
-  }
+  //     success(`Results has been updated with Moss URLs successfully! Head over to ${config.path.resultPath} to see the updated results!`)
+  //   })
+  // }
 	
   // static async resubmitNulls(){
   //   console.time('Completed! Time needed for completion was')
